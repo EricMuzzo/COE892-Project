@@ -4,10 +4,10 @@ from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from ..utils.auth import get_password_hash
 
-async def fetch_all_users(database: AsyncIOMotorDatabase) -> list:
+async def fetch_all_users(database: AsyncIOMotorDatabase, filters: dict = {}) -> list:
     """Returns a list of users from the users collection in database"""
     users = []
-    cursor = database["users"].find()
+    cursor = database["users"].find(filters)
     async for document in cursor:
         users.append(user_serial(document))
     return users

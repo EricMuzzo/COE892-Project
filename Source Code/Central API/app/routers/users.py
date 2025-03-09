@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Request, HTTPException, status
-from ..models.user import User, UserCreate, UserUpdate
+from fastapi import APIRouter, Request, HTTPException, status, Depends
+from typing import Annotated
+from ..models.user import User, UserCreate, UserUpdate, UserFilterParams
 from ..crud import users as user_crud
 
 
@@ -22,8 +23,9 @@ router = APIRouter(
 )
 
 @router.get("", summary="Get all users", description="Fetch a list of all users", response_model=list[User])
-async def getUsers(request: Request):
-    users = await user_crud.fetch_all_users(request.app.database)
+async def getUsers(request: Request, filter_params: UserFilterParams = Depends()):
+    filter_dict = filter_params.model_dump(exclude_unset=True, exclude_none=True)
+    users = await user_crud.fetch_all_users(request.app.database, filter_dict)
     return users
 
 

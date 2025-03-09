@@ -46,3 +46,9 @@ class TokenData(BaseModel):
     
 class UserSignUp(User):
     token: Token
+    
+
+class UserFilterParams(BaseModel):
+    user_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    name: Optional[str] = None
