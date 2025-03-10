@@ -1,0 +1,26 @@
+from pydantic import field_validator, BaseModel, Field
+from bson import ObjectId
+import datetime
+
+
+class PyObjectId(ObjectId):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not ObjectId.is_valid(v):
+            raise ValueError("Invalid ObjectId")
+        return ObjectId(v)
+
+    @classmethod
+    def __modify_schema__(cls, field_schema):
+        field_schema.update(type="string")
+        
+        
+class ReservationBase(BaseModel):
+    user_id: PyObjectId = Field(...)
+    start_time: datetime.datetime
+    end_time: datetime.datetime
+    spot_id: PyObjectId = Field(...)
