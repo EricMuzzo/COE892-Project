@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Request, HTTPException, status, Depends
-from typing import Annotated
-from ..models.user import User, UserCreate, UserUpdate, UserFilterParams
+from fastapi import APIRouter, HTTPException, status, Depends, Response
+from ..models.user import User, UserCreate, UserUpdate, UserFilterParams, UserCollection
 from ..crud import users as user_crud
 
 
@@ -22,37 +21,41 @@ router = APIRouter(
     tags=["Users"]
 )
 
-@router.get("", summary="Get all users", description="Fetch a list of all users", response_model=list[User])
-async def getUsers(request: Request, filter_params: UserFilterParams = Depends()):
+@router.get("", summary="Get all users", description="Fetch a list of all users", response_model=UserCollection)
+async def getUsers(filter_params: UserFilterParams = Depends()) -> UserCollection:
     filter_dict = filter_params.model_dump(exclude_unset=True, exclude_none=True)
-    users = await user_crud.fetch_all_users(request.app.database, filter_dict)
+    users = await user_crud.fetch_all_users(filter_dict)
     return users
 
 
-@router.get("/{id}", summary="Get user", description="Fetch a user by id", response_model=User, responses=user_not_found_response)
-async def getUser(id: str, request: Request):
-    user = await user_crud.fetch_user(request.app.database, id)
+@router.get("/{id}", summary="Get user", description="Fetch a user by their Mongo id", response_model=User, responses=user_not_found_response)
+async def getUser(id: str):
+    user = await user_crud.fetch_user(id)
     if user:
         return user
     raise HTTPException(status_code=404, detail=f"User with id {id} not found")
 
 
-@router.post("", summary="Create a user", description="Manually create a user", response_model=User, status_code=status.HTTP_201_CREATED)
-async def createUser(user: UserCreate, request: Request):
-    new_user = await user_crud.create_user(request.app.database, user.model_dump())
+@router.post("", summary="Create user", description="Manually create a user", response_model=User, status_code=status.HTTP_201_CREATED)
+async def createUser(user: UserCreate) -> User:
+    new_user = await user_crud.create_user(user.model_dump(by_alias=True, exclude=["id"]))
     return new_user
 
 
 @router.put("/{id}", summary="Update user", description="Update a user by ID", response_model=User, responses=user_not_found_response)
-async def updateUser(id: str, user_data: UserUpdate, request: Request):
-    updated_user = await user_crud.update_user(request.app.database, id, user_data.model_dump(exclude_unset=True))
-    if updated_user:
+async def updateUser(id: str, user_data: UserUpdate):
+    """Update a user by ID"""
+    
+    update_payload = user_data.model_dump(by_alias=True, exclude_none=True)
+    
+    updated_user = await user_crud.update_user(id, update_payload)
+    if updated_user is not None:
         return updated_user
-    raise HTTPException(status_code=404, detail=f"User with id {id} not found")
+    raise HTTPException(status_code=404, detail=f"User with {id} not found")
 
-@router.delete("/{id}", summary="Delete user", description="Delete a user by ID", status_code=status.HTTP_204_NO_CONTENT, responses=user_not_found_response)
-async def deleteUser(id: str, request: Request):
-    result = await user_crud.remove_user(request.app.database, id)
+@router.delete("/{id}", summary="Delete user", description="Delete a user by Mongo ID", status_code=status.HTTP_204_NO_CONTENT, responses=user_not_found_response)
+async def deleteUser(id: str):
+    result = await user_crud.remove_user(id)
     if result:
-        return {"message": "User deleted successfully"}
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
     raise HTTPException(status_code=404, detail=f"User with id {id} not found")
