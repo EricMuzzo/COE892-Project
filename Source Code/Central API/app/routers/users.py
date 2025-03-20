@@ -25,7 +25,7 @@ router = APIRouter(
 async def getUsers(filter_params: UserFilterParams = Depends()) -> UserCollection:
     filter_dict = filter_params.model_dump(exclude_unset=True, exclude_none=True)
     users = await user_crud.fetch_all_users(filter_dict)
-    return users
+    return UserCollection(users=users)
 
 
 @router.get("/{id}", summary="Get user", description="Fetch a user by their Mongo id", response_model=User, responses=user_not_found_response)
