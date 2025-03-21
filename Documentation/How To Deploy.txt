@@ -1,0 +1,25 @@
+Instructions for deploying to Azure
+
+1. Setup a container registry
+2. Setup a resource group
+(Instructions found through lab manual)
+
+How I deployed the API:
+1. Create dockerfile. I chose to run the API on port 80 (default HTTP) since the container instance on Azure gets its own IP so nothing else to worry about.
+
+2. Build the docker image: docker build -t <image_name>:<image_tag> .
+
+3. Login: docker login <container_registry_login_server>
+	Credentials can be found under Settings > Access Keys of the container registry
+
+4. Create the azure-ready image: docker tag <image_name>:<image_tag> <container_registry_login_server>/<image_name>:<image_tag>
+	Example: docker tag centralapi:latest coe892smartpark.azurecr.io/centralapi:latest
+
+5. Push the docker image to the container registry: docker push <container_registry_login_server>/<image_name>:<image_tag>
+	Example: docker push coe892smartpark.azurecr.io/centralapi:latest
+
+	It should now be there under the 'Repositories' section of the container registry
+
+6. Create a container instance: Search for container instance in the marketplace. Click create. Specify the resource group. Give the container a name. Select Azure Container Registry for Image Source. Select the registry you created and the image and tag name that we pushed in step 5. Click Next: Networking. Open the ports that you need. Since I chose to run the API on port 80, all I need to open is 80 (TCP)
+
+7. Review and Create. App is now deployed and should be running.
