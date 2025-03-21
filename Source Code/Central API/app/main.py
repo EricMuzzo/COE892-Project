@@ -18,7 +18,7 @@ A centralized RESTful API for the Smart Parking System application
 app = FastAPI(
     title="Central API",
     description=description,
-    version="1.0.2"
+    version="1.0.3"
 )
 
 @app.on_event("startup")

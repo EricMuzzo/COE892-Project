@@ -1,7 +1,6 @@
-from fastapi import Depends, HTTPException, status, WebSocket
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from pydantic import BaseModel
 from typing import Annotated
 import jwt
 from jwt.exceptions import InvalidTokenError
@@ -9,29 +8,13 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from ..models.user import User, UserCreate, Token, TokenData
 from ..schemas.user import user_serial
+import os
 
 #Possible solution to passlib bcrypt dependency issue: https://github.com/pyca/bcrypt/issues/684#issuecomment-1902590553
 
-SECRET_KEY = "056509aebe10c9cd862799f66bd169adef0a05f5f7d55e655ee641dc42a60494"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRES_MINUTES = 30
-
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
-        "disabled": False,
-    },
-    "alice": {
-        "username": "alice",
-        "full_name": "Alice Wonderson",
-        "email": "alice@example.com",
-        "hashed_password": "fakehashedsecret2",
-        "disabled": True,
-    },
-}
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRES_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRES_MINUTES")
     
     
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

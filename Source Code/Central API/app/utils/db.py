@@ -1,8 +1,8 @@
+import os
 import motor.motor_asyncio
 
-#hardcoding mongo connection string for now
-MONGO_URI = "mongodb+srv://ericmuzzo:Eric123@coe692project.1facf.mongodb.net/?retryWrites=true&w=majority&appName=coe692project"
-DB_NAME = 'coe692db'
+MONGO_URI = os.getenv("MONGO_URI")
+DB_NAME = os.getenv("DB_NAME")
 
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
 database = client.get_database(DB_NAME)
