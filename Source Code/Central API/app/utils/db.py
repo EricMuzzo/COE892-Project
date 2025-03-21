@@ -10,6 +10,7 @@ database = client.get_database(DB_NAME)
 reservations_collection = database.get_collection("reservations")
 users_collection = database.get_collection("users")
 spots_collection = database.get_collection("parking_spots")
+prices_collection = database["prices"]  
 
 async def create_indexes():
     await users_collection.create_index("username", unique=True, name="uname_unique")

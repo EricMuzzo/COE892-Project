@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routers import users, authentication, reservations, spots
+from .routers import users, authentication, reservations, spots, prices
 from .utils.db import create_indexes, close_mongo_connection
 
 #============================================================
@@ -37,6 +37,7 @@ app.include_router(users.router)
 app.include_router(spots.router)
 app.include_router(reservations.router)
 app.include_router(authentication.router)
+app.include_router(prices.router)
 
 
 @app.get("/")
