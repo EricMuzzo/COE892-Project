@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Response
 from ..models.user import User, UserCreate, UserUpdate, UserFilterParams, UserCollection
+from ..models.generic import ListResponse
 from ..crud import users as user_crud
 
 
@@ -21,11 +22,16 @@ router = APIRouter(
     tags=["Users"]
 )
 
-@router.get("", summary="Get all users", description="Fetch a list of all users", response_model=UserCollection)
-async def getUsers(filter_params: UserFilterParams = Depends()) -> UserCollection:
+@router.get(
+    path="",
+    summary="Get all users",
+    description="Fetch a list of all users",
+    response_model=ListResponse[User]
+)
+async def getUsers(filter_params: UserFilterParams = Depends()) -> ListResponse[User]:
     filter_dict = filter_params.model_dump(exclude_unset=True, exclude_none=True)
     users = await user_crud.fetch_all_users(filter_dict)
-    return UserCollection(users=users)
+    return ListResponse(records=users)
 
 
 @router.get("/{id}", summary="Get user", description="Fetch a user by their Mongo id", response_model=User, responses=user_not_found_response)

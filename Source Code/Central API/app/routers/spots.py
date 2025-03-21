@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, status, Response
 from ..models.spot import ParkingSpot, ParkingSpotBase, ParkingSpotCollection, ParkingSpotUpdate
+from ..models.generic import ListResponse
 from ..crud import spots as spots_crud
 from ..utils.filtering import parse_spots_filter
 
@@ -28,11 +29,11 @@ router = APIRouter(
     path="",
     summary="Get all parking spots",
     description="Fetch a list of all parking spots",
-    response_model=ParkingSpotCollection
+    response_model=ListResponse[ParkingSpot]
 )
-async def getSpots(filters: dict = Depends(parse_spots_filter)) -> ParkingSpotCollection:
+async def getSpots(filters: dict = Depends(parse_spots_filter)) -> ListResponse[ParkingSpot]:
     spots = await spots_crud.fetch_all_spots(filters)
-    return ParkingSpotCollection(spots=spots)
+    return ListResponse(records=spots)
 
 
 @router.get(

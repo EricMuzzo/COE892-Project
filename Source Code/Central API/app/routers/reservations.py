@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, status, Response
 from ..models.reservation import ReservationBase, Reservation, ReservationCollection
+from ..models.generic import ListResponse
 from ..crud import reservations as reservations_crud
 from ..utils.filtering import parse_reservations_filter
 
@@ -28,11 +29,11 @@ router = APIRouter(
     path="",
     summary="Get all reservations",
     description="Fetch a list of all reservations",
-    response_model=ReservationCollection
+    response_model=ListResponse[Reservation]
 )
-async def getReservations(filters: dict = Depends(parse_reservations_filter)) -> ReservationCollection:
+async def getReservations(filters: dict = Depends(parse_reservations_filter)) -> ListResponse[Reservation]:
     reservations = await reservations_crud.fetch_all_reservations(filters)
-    return ReservationCollection(reservations=reservations)
+    return ListResponse(records=reservations)
 
 
 @router.get(

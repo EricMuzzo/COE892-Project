@@ -24,3 +24,4 @@ class ParkingSpotUpdate(BaseModel):
     
 class ParkingSpotCollection(BaseModel):
     spots: List[ParkingSpot]
+    
