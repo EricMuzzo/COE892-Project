@@ -105,7 +105,6 @@ def parse_spots_filter(
     Returns:
         dict suitable for passing to spots_collection.find(mongo_filter).
     """
-
     mongo_filter = {}
 
     if filter:
@@ -133,7 +132,7 @@ def parse_spots_filter(
                         status_code=400,
                         detail=f"Invalid filter value for '{field_name}' in filter '{expr}'. Values accepted are 'vacant', 'occupied', 'reserved'"
                     )
-                    
+                value = raw_value
             
             elif field_name in ["floor_level", "spot_number"]:
                 try:
