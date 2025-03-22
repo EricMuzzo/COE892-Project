@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 import httpx
 
@@ -11,10 +11,10 @@ BASE_PRICES = {
     "evening": 8  # 6 PM - 12 AM
 }
 
-MAIN_APP_URL = "http://localhost:8001"  
+MAIN_APP_URL = "https://central-api-gud7ethebpctcag5.canadacentral-01.azurewebsites.net"  
 
 class PriceRequest(BaseModel):
-    timestamp: datetime  # Format: "2025-03-08T16:30:00"
+    timestamp: datetime = Field(..., example="2025-03-08T16:30:00")
 
 def get_base_price(timestamp: datetime) -> float:
 
